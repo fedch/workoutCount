@@ -4,6 +4,7 @@ struct ContentView: View {
     @AppStorage("reps") private var reps: Int = 0
     @AppStorage("sets") private var sets: Int = 0
     @AppStorage("weight") private var weight: Double = 0.0
+    @State private var history: [(set: Int, reps: Int, weight: Double)] = []
     
     var body: some View {
         VStack(spacing: 20) {
@@ -16,6 +17,17 @@ struct ContentView: View {
             CounterView(title: "Sets", value: $sets)
             WeightCounterView(weight: $weight)
             
+            Button(action: saveSet) {
+                Text("Save Set")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            }
+            .padding(.horizontal)
+            
             Button(action: resetCounters) {
                 Text("Reset")
                     .font(.title2)
@@ -26,14 +38,26 @@ struct ContentView: View {
                     .cornerRadius(10)
             }
             .padding(.horizontal)
+            
+            List(history, id: \ .set) { entry in
+                Text("Set \(entry.set): Reps \(entry.reps), Weight \(entry.weight, specifier: "%.1f") kg")
+            }
         }
         .padding()
+    }
+    
+    private func saveSet() {
+            history.append((set: sets, reps: reps, weight: weight))
+            sets += 1
+            reps = 0
+            weight = 0.0
     }
     
     private func resetCounters() {
         reps = 0
         sets = 0
         weight = 0.0
+        history.removeAll()
     }
 }
 
